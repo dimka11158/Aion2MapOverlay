@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenCvSharp4" Version="4.10.0.20241108" />
+    <PackageReference Include="OpenCvSharp4.Extensions" Version="4.10.0.20241108" />
+    <PackageReference Include="OpenCvSharp4.runtime.win" Version="4.10.0.20241108" />
+    <PackageReference Include="YamlDotNet" Version="16.2.1" />
+  </ItemGroup>
+
+  <!-- Embedded Resources: Maps, Markers, and Icons -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\maps\World_L_A.jpg" LogicalName="Aion2MapOverlay.Resources.maps.World_L_A.jpg" />
+    <EmbeddedResource Include="Resources\maps\World_D_A.jpg" LogicalName="Aion2MapOverlay.Resources.maps.World_D_A.jpg" />
+    <EmbeddedResource Include="Resources\maps\Abyss_Reshanta_A.jpg" LogicalName="Aion2MapOverlay.Resources.maps.Abyss_Reshanta_A.jpg" />
+    <EmbeddedResource Include="Resources\markers\World_L_A.yaml" LogicalName="Aion2MapOverlay.Resources.markers.World_L_A.yaml" />
+    <EmbeddedResource Include="Resources\markers\World_D_A.yaml" LogicalName="Aion2MapOverlay.Resources.markers.World_D_A.yaml" />
+    <EmbeddedResource Include="Resources\markers\Abyss_Reshanta_A.yaml" LogicalName="Aion2MapOverlay.Resources.markers.Abyss_Reshanta_A.yaml" />
+    <EmbeddedResource Include="Resources\icon.ico" LogicalName="Aion2MapOverlay.Resources.icon.ico" />
+  </ItemGroup>
+
+</Project>
