@@ -1,6 +1,6 @@
 https://github.com/user-attachments/assets/9cfe5d3c-6ae3-493b-87e8-e6c7b818e18c
 
-<img width="577" height="233" alt="updated" src="https://github.com/user-attachments/assets/0bf01555-5696-4d65-9081-2a8fa0fecd57" />
+<img width="576" height="257" alt="updated" src="https://github.com/user-attachments/assets/c37c8222-465a-4031-b1ea-338ebc58f8ec" />
 
 # Aion2 Map Overlay
 A real-time transparent overlay for Aion2 that detects the in-game world map and displays the locations of Monoliths (Feathers) and Hidden Cubes using computer vision-based screen matching.
