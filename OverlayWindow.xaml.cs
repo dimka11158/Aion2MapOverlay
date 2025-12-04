@@ -21,6 +21,7 @@ namespace Aion2MapOverlay;
 public partial class OverlayWindow : System.Windows.Window
 {
     private Faction _faction;
+    private MarkerFilter _filter;
     private RobustMapMatcher? _matcher;
     private List<(double LeafletX, double LeafletY, string Name, string Subtype)> _markers = [];
     private readonly DispatcherTimer _timer;
@@ -48,11 +49,12 @@ public partial class OverlayWindow : System.Windows.Window
     private DateTime _lastFpsUpdate = DateTime.Now;
     private double _currentFps;
 
-    public OverlayWindow(Faction faction)
+    public OverlayWindow(Faction faction, MarkerFilter filter)
     {
         InitializeComponent();
 
         _faction = faction;
+        _filter = filter;
 
         _timer = new DispatcherTimer
         {
@@ -182,8 +184,9 @@ public partial class OverlayWindow : System.Windows.Window
             var markerFile = YamlDeserializer.Deserialize<MarkerFileData>(yaml);
 
             _markers = markerFile.Markers
-                .Where(m => m.Subtype.Equals("monolithMaterial", StringComparison.OrdinalIgnoreCase) ||
-                           m.Subtype.Equals("hiddenCube", StringComparison.OrdinalIgnoreCase))
+                .Where(m =>
+                    (_filter.ShowMonolith && m.Subtype.Equals("monolithMaterial", StringComparison.OrdinalIgnoreCase)) ||
+                    (_filter.ShowHiddenCube && m.Subtype.Equals("hiddenCube", StringComparison.OrdinalIgnoreCase)))
                 .Select(m => (m.X, m.Y, m.Name, m.Subtype))
                 .ToList();
         }

@@ -38,7 +38,13 @@ public partial class FactionSelectWindow : Window
 
     private void StartOverlay(Faction faction)
     {
-        var overlayWindow = new OverlayWindow(faction);
+        var filter = new MarkerFilter
+        {
+            ShowMonolith = MonolithCheckBox.IsChecked == true,
+            ShowHiddenCube = HiddenCubeCheckBox.IsChecked == true
+        };
+
+        var overlayWindow = new OverlayWindow(faction, filter);
         overlayWindow.Show();
         Close();
     }
