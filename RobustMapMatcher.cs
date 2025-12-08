@@ -365,4 +365,3 @@ public struct ValidationResult
     public double GeometricScore;
     public double ReprojError;
 }
-

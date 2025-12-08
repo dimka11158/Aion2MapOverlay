@@ -11,6 +11,42 @@ public static class OverlaySettings
         public const double StrokeThickness = 2.0;
         public static readonly (byte R, byte G, byte B) MonolithColor = (255, 0, 255);
         public static readonly (byte R, byte G, byte B) HiddenCubeColor = (0, 255, 255);
+        public static readonly (byte R, byte G, byte B) OdyleColor = (255, 215, 0);
+        public static readonly (byte R, byte G, byte B) OrichalcumOreColor = (184, 115, 51);
+        public static readonly (byte R, byte G, byte B) DiamondGemstoneColor = (185, 242, 255);
+        public static readonly (byte R, byte G, byte B) YggdrasilLogColor = (34, 139, 34);
+        public static readonly (byte R, byte G, byte B) SapphireGemstoneColor = (15, 82, 186);
+        public static readonly (byte R, byte G, byte B) TargenaColor = (255, 127, 80);
+        public static readonly (byte R, byte G, byte B) CoriolusColor = (148, 0, 211);
+        public static readonly (byte R, byte G, byte B) RubyGemstoneColor = (224, 17, 95);
+        public static readonly (byte R, byte G, byte B) IninaColor = (64, 224, 208);
+        public static readonly (byte R, byte G, byte B) KukuruColor = (255, 165, 0);
+        public static readonly (byte R, byte G, byte B) MelaColor = (50, 205, 50);
+        public static readonly (byte R, byte G, byte B) AriaColor = (255, 182, 193);
+        public static readonly (byte R, byte G, byte B) CypriColor = (0, 191, 255);
+
+        public static (byte R, byte G, byte B) GetColorForSubtype(string subtype)
+        {
+            return subtype.ToLowerInvariant() switch
+            {
+                "monolithmaterial" => MonolithColor,
+                "hiddencube" => HiddenCubeColor,
+                "gatheringodyle" => OdyleColor,
+                "gatheringorichalcumore" => OrichalcumOreColor,
+                "gatheringdiamondgemstone" => DiamondGemstoneColor,
+                "gatheringyggdrasillog" => YggdrasilLogColor,
+                "gatheringsapphiregemstone" => SapphireGemstoneColor,
+                "gatheringtargena" => TargenaColor,
+                "gatheringcoriolus" => CoriolusColor,
+                "gatheringrubygemstone" => RubyGemstoneColor,
+                "gatheringinina" => IninaColor,
+                "gatheringkukuru" => KukuruColor,
+                "gatheringmela" => MelaColor,
+                "gatheringaria" => AriaColor,
+                "gatheringcypri" => CypriColor,
+                _ => (128, 128, 128)
+            };
+        }
     }
 }
 

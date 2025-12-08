@@ -29,18 +29,7 @@ public partial class OverlayWindow : System.Windows.Window
     private NotifyIcon? _trayIcon;
     private ContextMenuStrip? _trayContextMenu;
     private System.Drawing.Icon? _trayIconImage;
-    private ToolStripMenuItem? _elyosMenuItem;
-    private ToolStripMenuItem? _asmodiansMenuItem;
-    private ToolStripMenuItem? _abyssMenuItem;
 
-    private static readonly WpfColor MonolithColor = WpfColor.FromRgb(
-        OverlaySettings.Markers.MonolithColor.R,
-        OverlaySettings.Markers.MonolithColor.G,
-        OverlaySettings.Markers.MonolithColor.B);
-    private static readonly WpfColor HiddenCubeColor = WpfColor.FromRgb(
-        OverlaySettings.Markers.HiddenCubeColor.R,
-        OverlaySettings.Markers.HiddenCubeColor.G,
-        OverlaySettings.Markers.HiddenCubeColor.B);
     private static readonly IDeserializer YamlDeserializer = new DeserializerBuilder()
         .IgnoreUnmatchedProperties()
         .Build();
@@ -88,19 +77,9 @@ public partial class OverlayWindow : System.Windows.Window
     {
         _trayContextMenu = new ContextMenuStrip();
 
-        _elyosMenuItem = new ToolStripMenuItem("Elyos (천족/天族)");
-        _elyosMenuItem.Click += (s, e) => ChangeFaction(Faction.Elyos);
-        _trayContextMenu.Items.Add(_elyosMenuItem);
-
-        _asmodiansMenuItem = new ToolStripMenuItem("Asmodians (마족/魔族)");
-        _asmodiansMenuItem.Click += (s, e) => ChangeFaction(Faction.Asmodians);
-        _trayContextMenu.Items.Add(_asmodiansMenuItem);
-
-        _abyssMenuItem = new ToolStripMenuItem("Abyss (심연/深淵)");
-        _abyssMenuItem.Click += (s, e) => ChangeFaction(Faction.Abyss);
-        _trayContextMenu.Items.Add(_abyssMenuItem);
-
-        UpdateFactionMenuChecks();
+        var settingsItem = new ToolStripMenuItem("Settings...");
+        settingsItem.Click += (s, e) => Dispatcher.Invoke(OpenSettings);
+        _trayContextMenu.Items.Add(settingsItem);
 
         _trayContextMenu.Items.Add(new System.Windows.Forms.ToolStripSeparator());
 
@@ -119,43 +98,25 @@ public partial class OverlayWindow : System.Windows.Window
         };
     }
 
-    private void UpdateFactionMenuChecks()
+    private void OpenSettings()
     {
-        if (_elyosMenuItem != null)
-            _elyosMenuItem.Checked = _faction == Faction.Elyos;
-        if (_asmodiansMenuItem != null)
-            _asmodiansMenuItem.Checked = _faction == Faction.Asmodians;
-        if (_abyssMenuItem != null)
-            _abyssMenuItem.Checked = _faction == Faction.Abyss;
-    }
+        _timer.Stop();
+        Hide();
 
-    private void ChangeFaction(Faction newFaction)
-    {
-        if (_faction == newFaction)
-            return;
-
-        _faction = newFaction;
-
-        string factionName = _faction switch
+        var settingsWindow = new FactionSelectWindow(_faction, _filter);
+        settingsWindow.Closed += (s, e) =>
         {
-            Faction.Elyos => "ELYOS (천족/天族)",
-            Faction.Asmodians => "ASMODIANS (마족/魔族)",
-            Faction.Abyss => "ABYSS (심연/深淵)",
-            _ => "UNKNOWN"
+            if (settingsWindow.OverlayStarted)
+            {
+                Close();
+            }
+            else
+            {
+                Show();
+                _timer.Start();
+            }
         };
-
-        Dispatcher.Invoke(() =>
-        {
-            FactionText.Text = factionName;
-            ClearMarkers();
-        });
-
-        if (_trayIcon != null)
-            _trayIcon.Text = $"Aion2 Map Overlay - {_faction}";
-        UpdateFactionMenuChecks();
-
-        _matcher?.Dispose();
-        LoadData();
+        settingsWindow.Show();
     }
 
     private void SetupTransparentWindow()
@@ -184,9 +145,7 @@ public partial class OverlayWindow : System.Windows.Window
             var markerFile = YamlDeserializer.Deserialize<MarkerFileData>(yaml);
 
             _markers = markerFile.Markers
-                .Where(m =>
-                    (_filter.ShowMonolith && m.Subtype.Equals("monolithMaterial", StringComparison.OrdinalIgnoreCase)) ||
-                    (_filter.ShowHiddenCube && m.Subtype.Equals("hiddenCube", StringComparison.OrdinalIgnoreCase)))
+                .Where(m => ShouldShowMarker(m.Subtype))
                 .Select(m => (m.X, m.Y, m.Name, m.Subtype))
                 .ToList();
         }
@@ -194,6 +153,29 @@ public partial class OverlayWindow : System.Windows.Window
         {
             WpfMessageBox.Show($"Failed to load data:\n{ex.Message}", "Error", WpfMessageBoxButton.OK, WpfMessageBoxImage.Error);
         }
+    }
+
+    private bool ShouldShowMarker(string subtype)
+    {
+        return subtype.ToLowerInvariant() switch
+        {
+            "monolithmaterial" => _filter.ShowMonolith,
+            "hiddencube" => _filter.ShowHiddenCube,
+            "gatheringodyle" => _filter.ShowOdyle,
+            "gatheringorichalcumore" => _filter.ShowOrichalcumOre,
+            "gatheringdiamondgemstone" => _filter.ShowDiamondGemstone,
+            "gatheringyggdrasillog" => _filter.ShowYggdrasilLog,
+            "gatheringsapphiregemstone" => _filter.ShowSapphireGemstone,
+            "gatheringtargena" => _filter.ShowTargena,
+            "gatheringcoriolus" => _filter.ShowCoriolus,
+            "gatheringrubygemstone" => _filter.ShowRubyGemstone,
+            "gatheringinina" => _filter.ShowInina,
+            "gatheringkukuru" => _filter.ShowKukuru,
+            "gatheringmela" => _filter.ShowMela,
+            "gatheringaria" => _filter.ShowAria,
+            "gatheringcypri" => _filter.ShowCypri,
+            _ => false
+        };
     }
 
     private void Timer_Tick(object? sender, EventArgs e)
@@ -287,9 +269,8 @@ public partial class OverlayWindow : System.Windows.Window
 
         foreach (var marker in markers)
         {
-            WpfColor baseColor = marker.Subtype.Equals("hiddenCube", StringComparison.OrdinalIgnoreCase)
-                ? HiddenCubeColor
-                : MonolithColor;
+            var colorTuple = OverlaySettings.Markers.GetColorForSubtype(marker.Subtype);
+            var baseColor = WpfColor.FromRgb(colorTuple.R, colorTuple.G, colorTuple.B);
 
             var fillColor = WpfColor.FromArgb(alpha, baseColor.R, baseColor.G, baseColor.B);
             var strokeColor = WpfColor.FromArgb(alpha, 255, 255, 255);
