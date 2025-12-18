@@ -23,7 +23,7 @@ public partial class OverlayWindow : System.Windows.Window
     private Faction _faction;
     private MarkerFilter _filter;
     private RobustMapMatcher? _matcher;
-    private List<(double LeafletX, double LeafletY, string Name, string Subtype)> _markers = [];
+    private List<(double LeafletX, double LeafletY, string Subtype)> _markers = [];
     private readonly DispatcherTimer _timer;
     private readonly List<System.Windows.UIElement> _markerElements = [];
     private NotifyIcon? _trayIcon;
@@ -146,7 +146,7 @@ public partial class OverlayWindow : System.Windows.Window
 
             _markers = markerFile.Markers
                 .Where(m => ShouldShowMarker(m.Subtype))
-                .Select(m => (m.X, m.Y, m.Name, m.Subtype))
+                .Select(m => (m.X, m.Y, m.Subtype))
                 .ToList();
         }
         catch (Exception ex)
@@ -222,9 +222,9 @@ public partial class OverlayWindow : System.Windows.Window
         UpdateFps();
     }
 
-    private List<(float X, float Y, string Name, string Subtype)> ProjectMarkersWithSubtype(MatchResult result)
+    private List<(float X, float Y, string Subtype)> ProjectMarkersWithSubtype(MatchResult result)
     {
-        var screenMarkers = new List<(float X, float Y, string Name, string Subtype)>();
+        var screenMarkers = new List<(float X, float Y, string Subtype)>();
 
         if (result.HomographyInverse == null)
             return screenMarkers;
@@ -249,19 +249,18 @@ public partial class OverlayWindow : System.Windows.Window
                 if (screenPoint[0].X >= 0 && screenPoint[0].X < result.ScreenSize.Width &&
                     screenPoint[0].Y >= 0 && screenPoint[0].Y < result.ScreenSize.Height)
                 {
-                    screenMarkers.Add((screenPoint[0].X, screenPoint[0].Y, marker.Name, marker.Subtype));
+                    screenMarkers.Add((screenPoint[0].X, screenPoint[0].Y, marker.Subtype));
                 }
             }
-            catch (OpenCvSharp.OpenCVException ex)
+            catch (OpenCvSharp.OpenCVException)
             {
-                System.Diagnostics.Debug.WriteLine($"[OverlayWindow] Marker projection failed for '{marker.Name}': {ex.Message}");
             }
         }
 
         return screenMarkers;
     }
 
-    private void UpdateOverlay(List<(float X, float Y, string Name, string Subtype)> markers, double confidence)
+    private void UpdateOverlay(List<(float X, float Y, string Subtype)> markers, double confidence)
     {
         ClearMarkers();
 

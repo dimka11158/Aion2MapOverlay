@@ -18,9 +18,6 @@ public class MarkerData
 
     [YamlMember(Alias = "y")]
     public double Y { get; set; }
-
-    [YamlMember(Alias = "name")]
-    public string Name { get; set; } = "";
 }
 
 public enum Faction { Elyos, Asmodians, Abyss }
